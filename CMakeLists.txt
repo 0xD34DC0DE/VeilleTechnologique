@@ -18,7 +18,7 @@ endif ()
 #
 
 set(ASMLGEN_VERSION_REGEX "#define ASMLGEN_VERSION_.*[ \t]+(.+)")
-file(STRINGS "engine/include/asmlgen/engine/config/version.h" ASMLGEN_VERSION REGEX ${ASMLGEN_VERSION_REGEX})
+file(STRINGS "application/include/asmlgen/application/config/version.h" ASMLGEN_VERSION REGEX ${ASMLGEN_VERSION_REGEX})
 list(TRANSFORM ASMLGEN_VERSION REPLACE ${ASMLGEN_VERSION_REGEX} "\\1")
 string(JOIN "." ASMLGEN_VERSION ${ASMLGEN_VERSION})
 
@@ -43,8 +43,6 @@ include(cmake/CompilerWarnings.cmake)
 #
 
 include(cmake/Conan.cmake)
-
-add_conan_package(glfw/3.3.4)
 
 if (BUILD_TESTS)
     add_conan_package(gtest/1.11.0)
