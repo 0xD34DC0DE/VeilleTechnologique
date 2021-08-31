@@ -1,3 +1,12 @@
 To be able to use the needed conan packages please install the conan client
 on your machine and run the following commands:
 Link to conan client installer: https://conan.io/downloads.html
+
+conan remote add bincrafters https://bincrafters.jfrog.io/artifactory/api/conan/public-conan
+conan config set general.revisions_enabled=1
+
+inside the cmake directory:
+    for release builds: conan install . -g cmake_multi -s build_type=Release --build=missing
+    for debug builds: conan install . -g cmake_multi -s build_type=Debug --build=missing
+
+You will need to run the corresponding command everytime you switch to a different

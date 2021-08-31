@@ -1,9 +1,9 @@
 AccessModifierOffset: -2
 AlignAfterOpenBracket: DontAlign
-AlignConsecutiveAssignments: false
-AlignConsecutiveBitFields: true
-AlignConsecutiveDeclarations: false
-AlignConsecutiveMacros: false
+AlignConsecutiveAssignments: None
+AlignConsecutiveBitFields: Consecutive
+AlignConsecutiveDeclarations: None
+AlignConsecutiveMacros: None
 AlignEscapedNewlines: Left
 AlignTrailingComments: false
 AllowAllArgumentsOnNextLine: true
@@ -83,7 +83,7 @@ ObjCSpaceAfterProperty: true
 ObjCSpaceBeforeProtocolList: false
 PointerAlignment: Left
 ReflowComments: true
-SortIncludes: true
+SortIncludes: CaseInsensitive
 SortUsingDeclarations: false
 SpaceAfterCStyleCast: false
 SpaceAfterLogicalNot: false

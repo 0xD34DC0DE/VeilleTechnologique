@@ -14,6 +14,8 @@ include(${CMAKE_BINARY_DIR}/conan.cmake)
 
 conan_check(VERSION 1.37.0 REQUIRED)
 
+conan_add_remote(NAME bincrafters URL https://bincrafters.jfrog.io/artifactory/api/conan/public-conan)
+
 set(CONAN_REQUIRED_PACKAGES "")
 set(CONAN_PACKAGE_OPTIONS "")
 

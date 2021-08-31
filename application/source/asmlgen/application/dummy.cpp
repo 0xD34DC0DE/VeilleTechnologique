@@ -1,6 +1,6 @@
-/// Dummy file to get project to compile
-#include <iostream>
+#include "asmlgen/application/dummy.h"
 
-int main(int argc, char** argv) {
-    std::cout << "Project is compiling!" << std::endl;
+
+
+int dummy() {return 0;
 }
