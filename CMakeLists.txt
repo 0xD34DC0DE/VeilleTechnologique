@@ -44,6 +44,8 @@ include(cmake/CompilerWarnings.cmake)
 
 include(cmake/Conan.cmake)
 
+add_conan_package(rapidjson/cci.20200410)
+
 if (BUILD_TESTS)
     add_conan_package(gtest/1.11.0)
 endif ()
