@@ -3,9 +3,13 @@
 
 #include <rapidjson/document.h>
 #include <string>
+#include <vector>
 
 namespace dataset
 {
+// todo add no discard
+
+rapidjson::Document* GetParsedDocument(const std::vector<char>& json);
 
 template<typename T>
 T ParseValueField(const rapidjson::Value& jsonValueRef, const char* fieldName);
