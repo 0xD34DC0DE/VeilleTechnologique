@@ -10,15 +10,19 @@ uint64_t CocoJsonParser::LoadJson(const std::vector<char>& json)
   rapidjson::Document* document = GetParsedDocument(json);
 
   if (document == nullptr) { return 0; }
+
+  std::unordered_map<uint64_t, COCOAnnotation> annotations = ParseAnnotations(document);
 }
 
-std::unordered_map<uint64_t, COCOAnnotation> CocoJsonParser::ParseAnnotations(rapidjson::Document& document)
+std::unordered_map<uint64_t, COCOAnnotation> CocoJsonParser::ParseAnnotations(const rapidjson::Document* document)
 {
+  const rapidjson::Document& doc = *document;
+
   std::unordered_map<uint64_t, COCOAnnotation> coco_annotations;
 
-  if (document.HasMember("annotations"))
+  if (document->HasMember("annotations"))
   {
-    const rapidjson::Value& annotation_array = document["annotations"];
+    const rapidjson::Value& annotation_array = doc["annotations"];
 
     if (!annotation_array.IsArray())
     {

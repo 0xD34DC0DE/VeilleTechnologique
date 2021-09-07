@@ -26,7 +26,7 @@ private:
   using ImageMap = std::unordered_map<uint64_t, COCOImage>;
   using CategoryMap = std::unordered_map<uint32_t, COCOCategory>;
 
-  static std::unordered_map<uint64_t, COCOAnnotation> ParseAnnotations(rapidjson::Document& document);
+  static std::unordered_map<uint64_t, COCOAnnotation> ParseAnnotations(const rapidjson::Document* document);
 
   static std::pair<std::vector<float>, std::pair<uint32_t, uint32_t>> ParseRLEAnnotationArray(
     const rapidjson::Value& segmentation);
