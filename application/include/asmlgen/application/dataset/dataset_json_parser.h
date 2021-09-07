@@ -29,7 +29,7 @@ public:
 
 private:
   std::vector<T> entries_;
-  std::unordered_map<std::string, std::vector<std::string>> class_name_groups_;
+  ClassNameGroupMap class_name_groups_;
 };
 
 } // namespace dataset
