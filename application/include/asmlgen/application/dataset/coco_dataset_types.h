@@ -26,7 +26,7 @@ struct COCOAnnotation
   uint32_t categoryId;
   bool isCrowd;
   SegmentationData segmentation;
-  std::pair<unsigned int, unsigned int> size;
+  std::pair<uint32_t, uint32_t> size;
   uint64_t imageId;
   const COCOImage* cocoImagePtr = nullptr;
 };

@@ -13,12 +13,12 @@ uint64_t CocoJsonParser::LoadJson(const std::vector<char>& json)
 
   AnnotationMap annotations = ParseAnnotations(document);
   ImageMap images = ParseImages(document);
+  CategoryMap categories = ParseCategories(document);
 }
 
 CocoJsonParser::AnnotationMap CocoJsonParser::ParseAnnotations(const rapidjson::Document* document)
 {
   const rapidjson::Document& doc = *document;
-
   AnnotationMap coco_annotations;
 
   if (document->HasMember("annotations"))
