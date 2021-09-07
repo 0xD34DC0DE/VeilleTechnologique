@@ -1,7 +1,8 @@
 #ifndef ASMLGEN_TRANSIENT_COCO_ENTRY_H
 #define ASMLGEN_TRANSIENT_COCO_ENTRY_H
 
-#include "transient_dataset_entry.h"
+#include "asmlgen/application/dataset/coco_dataset_types.h"
+#include "asmlgen/application/dataset/transient_dataset_entry.h"
 
 namespace dataset
 {
@@ -23,6 +24,7 @@ public:
   void ProcessData() override;
 
 private:
+  // Coco dataset format implementation types and function used by friend parser class
 };
 
 } // namespace dataset
