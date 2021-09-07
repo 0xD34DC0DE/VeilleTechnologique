@@ -1,6 +1,7 @@
 #ifndef ASMLGEN_DATASET_JSON_PARSER_H
 #define ASMLGEN_DATASET_JSON_PARSER_H
 
+#include <unordered_map>
 #include <vector>
 
 namespace dataset
@@ -19,10 +20,14 @@ public:
   virtual uint64_t LoadJson(const std::vector<char>& json) = 0;
 
   // Get the processed items
-  const std::vector<T>& Entries() const noexcept;
+  [[nodiscard]] const std::vector<T>& Entries() const noexcept;
+
+  // Get the map of names grouped into classes
+  [[nodiscard]] const std::unordered_map<std::string, std::vector<std::string>>& ClassNameGroups() const noexcept;
 
 private:
   std::vector<T> entries_;
+  std::unordered_map<std::string, std::vector<std::string>> class_name_groups_;
 };
 
 } // namespace dataset
