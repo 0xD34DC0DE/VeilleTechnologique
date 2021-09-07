@@ -13,6 +13,8 @@ template<typename T>
 class DatasetJsonParser
 {
 public:
+  using ClassNameGroupMap = std::unordered_map<std::string, std::vector<std::string>>;
+
   DatasetJsonParser() = default;
 
   // Takes in a char vector representing the json file and returns the number of elements processed
@@ -22,8 +24,8 @@ public:
   // Get the processed items
   [[nodiscard]] const std::vector<T>& Entries() const noexcept;
 
-  // Get the map of names grouped into classes
-  [[nodiscard]] const std::unordered_map<std::string, std::vector<std::string>>& ClassNameGroups() const noexcept;
+  // Get the map of category names grouped into classes
+  [[nodiscard]] const ClassNameGroupMap& ClassNameGroups() const noexcept;
 
 private:
   std::vector<T> entries_;
