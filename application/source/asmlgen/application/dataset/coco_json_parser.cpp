@@ -11,14 +11,14 @@ uint64_t CocoJsonParser::LoadJson(const std::vector<char>& json)
 
   if (document == nullptr) { return 0; }
 
-  std::unordered_map<uint64_t, COCOAnnotation> annotations = ParseAnnotations(document);
+  AnnotationMap annotations = ParseAnnotations(document);
 }
 
-std::unordered_map<uint64_t, COCOAnnotation> CocoJsonParser::ParseAnnotations(const rapidjson::Document* document)
+CocoJsonParser::AnnotationMap CocoJsonParser::ParseAnnotations(const rapidjson::Document* document)
 {
   const rapidjson::Document& doc = *document;
 
-  std::unordered_map<uint64_t, COCOAnnotation> coco_annotations;
+  AnnotationMap coco_annotations;
 
   if (document->HasMember("annotations"))
   {
@@ -107,9 +107,9 @@ std::vector<std::vector<float>> CocoJsonParser::ParsePolygonAnnotationArray(cons
   return polygon_arrays;
 }
 
-std::unordered_map<uint64_t, COCOImage> CocoJsonParser::ParseImages(const rapidjson::Document& document)
+CocoJsonParser::ImageMap CocoJsonParser::ParseImages(const rapidjson::Document& document)
 {
-  std::unordered_map<uint64_t, COCOImage> coco_images;
+  ImageMap coco_images;
 
   if (document.HasMember("images"))
   {
@@ -134,9 +134,9 @@ std::unordered_map<uint64_t, COCOImage> CocoJsonParser::ParseImages(const rapidj
   return coco_images;
 }
 
-std::unordered_map<uint32_t, COCOCategory> CocoJsonParser::ParseCategories(const rapidjson::Document& document)
+CocoJsonParser::CategoryMap CocoJsonParser::ParseCategories(const rapidjson::Document& document)
 {
-  std::unordered_map<uint32_t, COCOCategory> coco_categories;
+  CategoryMap coco_categories;
 
   if (document.HasMember("categories"))
   {
