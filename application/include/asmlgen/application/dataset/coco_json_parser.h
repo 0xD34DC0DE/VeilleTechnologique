@@ -37,6 +37,12 @@ private:
 
   static std::unordered_map<uint32_t, COCOCategory> ParseCategories(const rapidjson::Document* document);
 
+  static void LinkImagesToAnnotations(AnnotationMap& annotations, const ImageMap& images);
+
+  static void LinkCategoriesToAnnotations(AnnotationMap& annotations, const CategoryMap& categories);
+
+  static DatasetJsonParser<TransientCocoEntry>::ClassNameGroupMap CreateClassNameGroups(const CategoryMap& categories);
+
   AnnotationMap annotations_;
   ImageMap images_;
   CategoryMap categories_;

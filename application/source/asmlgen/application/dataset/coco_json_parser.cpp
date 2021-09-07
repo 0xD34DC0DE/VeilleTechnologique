@@ -2,6 +2,8 @@
 
 #include "asmlgen/application/dataset/json_parsing_helpers.h"
 
+#include <algorithm>
+
 namespace dataset
 {
 
@@ -14,6 +16,11 @@ uint64_t CocoJsonParser::LoadJson(const std::vector<char>& json)
   AnnotationMap annotations = ParseAnnotations(document);
   ImageMap images = ParseImages(document);
   CategoryMap categories = ParseCategories(document);
+
+  LinkImagesToAnnotations(annotations, images);
+  LinkCategoriesToAnnotations(annotations, categories);
+
+  class_name_groups_ = CreateClassNameGroups(categories);
 }
 
 CocoJsonParser::AnnotationMap CocoJsonParser::ParseAnnotations(const rapidjson::Document* document)
@@ -159,5 +166,47 @@ CocoJsonParser::CategoryMap CocoJsonParser::ParseCategories(const rapidjson::Doc
   }
 
   return coco_categories;
+}
+
+void CocoJsonParser::LinkImagesToAnnotations(
+  CocoJsonParser::AnnotationMap& annotations, const CocoJsonParser::ImageMap& images)
+{
+  for (auto& annotation : annotations)
+  {
+    auto imageIt = images.find(annotation.second.imageId);
+    if (imageIt != images.end()) { annotation.second.cocoImagePtr = &imageIt->second; }
+  }
+}
+
+void CocoJsonParser::LinkCategoriesToAnnotations(
+  CocoJsonParser::AnnotationMap& annotations, const CocoJsonParser::CategoryMap& categories)
+{
+  for (auto& annotation : annotations)
+  {
+    auto categoryIt = categories.find(annotation.second.categoryId);
+    if (categoryIt != categories.end()) { annotation.second.category_name = categoryIt->second.name; }
+  }
+}
+
+DatasetJsonParser<CocoJsonParser>::ClassNameGroupMap CocoJsonParser::CreateClassNameGroups(
+  const CategoryMap& categories)
+{
+  ClassNameGroupMap class_name_group_map;
+
+  for (auto& category : categories)
+  {
+    auto classIt = class_name_group_map.find(category.second.supercategory);
+    if (classIt != class_name_group_map.end())
+    {
+      auto name_iter = std::ranges::find(classIt->second, category.second.name);
+      if (name_iter == classIt->second.end()) { classIt->second.emplace_back(category.second.name); }
+    }
+    else
+    {
+      class_name_group_map[category.second.supercategory] = { category.second.name };
+    }
+  }
+
+  return class_name_group_map;
 }
 } // namespace dataset
