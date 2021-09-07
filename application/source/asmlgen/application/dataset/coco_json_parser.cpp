@@ -12,6 +12,7 @@ uint64_t CocoJsonParser::LoadJson(const std::vector<char>& json)
   if (document == nullptr) { return 0; }
 
   AnnotationMap annotations = ParseAnnotations(document);
+  ImageMap images = ParseImages(document);
 }
 
 CocoJsonParser::AnnotationMap CocoJsonParser::ParseAnnotations(const rapidjson::Document* document)
@@ -107,13 +108,14 @@ std::vector<std::vector<float>> CocoJsonParser::ParsePolygonAnnotationArray(cons
   return polygon_arrays;
 }
 
-CocoJsonParser::ImageMap CocoJsonParser::ParseImages(const rapidjson::Document& document)
+CocoJsonParser::ImageMap CocoJsonParser::ParseImages(const rapidjson::Document* document)
 {
+  const rapidjson::Document& doc = *document;
   ImageMap coco_images;
 
-  if (document.HasMember("images"))
+  if (doc.HasMember("images"))
   {
-    const rapidjson::Value& image_array = document["images"];
+    const rapidjson::Value& image_array = doc["images"];
     assert(image_array.IsArray());
 
     for (auto& image : image_array.GetArray())
@@ -134,13 +136,14 @@ CocoJsonParser::ImageMap CocoJsonParser::ParseImages(const rapidjson::Document& 
   return coco_images;
 }
 
-CocoJsonParser::CategoryMap CocoJsonParser::ParseCategories(const rapidjson::Document& document)
+CocoJsonParser::CategoryMap CocoJsonParser::ParseCategories(const rapidjson::Document* document)
 {
+  const rapidjson::Document& doc = *document;
   CategoryMap coco_categories;
 
-  if (document.HasMember("categories"))
+  if (doc.HasMember("categories"))
   {
-    const rapidjson::Value& category_array = document["categories"];
+    const rapidjson::Value& category_array = doc["categories"];
     assert(category_array.IsArray());
 
     for (auto& category : category_array.GetArray())

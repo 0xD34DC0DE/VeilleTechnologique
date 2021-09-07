@@ -33,9 +33,9 @@ private:
 
   static std::vector<std::vector<float>> ParsePolygonAnnotationArray(const rapidjson::Value& segmentation);
 
-  static std::unordered_map<uint64_t, COCOImage> ParseImages(const rapidjson::Document& document);
+  static std::unordered_map<uint64_t, COCOImage> ParseImages(const rapidjson::Document* document);
 
-  static std::unordered_map<uint32_t, COCOCategory> ParseCategories(const rapidjson::Document& document);
+  static std::unordered_map<uint32_t, COCOCategory> ParseCategories(const rapidjson::Document* document);
 
   AnnotationMap annotations_;
   ImageMap images_;
