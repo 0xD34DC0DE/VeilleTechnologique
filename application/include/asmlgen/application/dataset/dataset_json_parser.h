@@ -27,7 +27,7 @@ public:
   // Get the map of category names grouped into classes
   [[nodiscard]] const ClassNameGroupMap& ClassNameGroups() const noexcept;
 
-private:
+protected:
   std::vector<T> entries_;
   ClassNameGroupMap class_name_groups_;
 };
