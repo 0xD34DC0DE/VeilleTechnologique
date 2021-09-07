@@ -2,6 +2,7 @@
 #define ASMLGEN_COCO_DATASET_TYPES_H
 
 #include <string>
+#include <string_view>
 #include <variant>
 
 namespace dataset
@@ -29,6 +30,7 @@ struct COCOAnnotation
   std::pair<uint32_t, uint32_t> size;
   uint64_t imageId;
   const COCOImage* cocoImagePtr = nullptr;
+  std::string_view category_name;
 };
 
 struct COCOCategory
