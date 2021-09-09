@@ -18,6 +18,7 @@ class CocoJsonParser : public DatasetJsonParser<TransientCocoEntry>
 {
 public:
   CocoJsonParser() = default;
+  ~CocoJsonParser() override = default;
 
   uint64_t LoadJson(const std::vector<char>& json) override;
 
