@@ -3,4 +3,10 @@
 namespace dataset
 {
 
+void TransientCocoEntry::ProcessData() {}
+
+std::size_t TransientCocoEntry::AcquireData()
+{
+  return 0;
 }
+} // namespace dataset

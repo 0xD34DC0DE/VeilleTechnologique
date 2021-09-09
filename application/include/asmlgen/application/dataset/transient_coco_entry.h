@@ -4,12 +4,17 @@
 #include "asmlgen/application/dataset/coco_dataset_types.h"
 #include "asmlgen/application/dataset/transient_dataset_entry.h"
 
+#include <cstdint>
+#include <string>
+#include <vector>
+
 namespace dataset
 {
 
 class TransientCocoEntry : public TransientDatasetEntry
 {
 public:
+  friend class CocoJsonParser;
   TransientCocoEntry() = default;
   ~TransientCocoEntry() override = default;
 
@@ -24,8 +29,14 @@ public:
   ///
   void ProcessData() override;
 
-private:
+protected:
   // Coco dataset format implementation types and function used by friend parser class
+  uint32_t image_width_ {};
+  uint32_t image_height_ {};
+  std::string image_url_;
+
+  // List of annotations and their corresponding category name
+  std::vector<std::pair<std::string, SegmentationData>> annotation_segmentations_data;
 };
 
 } // namespace dataset
