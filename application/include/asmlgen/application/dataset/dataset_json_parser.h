@@ -1,6 +1,7 @@
 #ifndef ASMLGEN_DATASET_JSON_PARSER_H
 #define ASMLGEN_DATASET_JSON_PARSER_H
 
+#include "asmlgen/application/dataset/transient_dataset_entry.h"
 #include <unordered_map>
 #include <vector>
 
