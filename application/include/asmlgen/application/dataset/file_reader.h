@@ -1,5 +1,5 @@
-#ifndef ASMLGEN_FILE_LOADER_H
-#define ASMLGEN_FILE_LOADER_H
+#ifndef ASMLGEN_FILE_READER_H
+#define ASMLGEN_FILE_READER_H
 
 #include <string>
 #include <vector>
@@ -16,4 +16,4 @@ public:
 
 } // namespace dataset
 
-#endif // ASMLGEN_FILE_LOADER_H
+#endif // ASMLGEN_FILE_READER_H
