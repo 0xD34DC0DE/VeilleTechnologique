@@ -21,3 +21,5 @@ endfunction()
 #
 
 add_sandbox_project(parser)
+
+add_sandbox_project(async)
