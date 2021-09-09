@@ -1,6 +1,7 @@
 #ifndef ASMLGEN_COCO_JSON_PARSER_H
 #define ASMLGEN_COCO_JSON_PARSER_H
 
+#include "asmlgen/application/dataset/coco_dataset_types.h"
 #include "asmlgen/application/dataset/dataset_json_parser.h"
 #include "asmlgen/application/dataset/transient_coco_entry.h"
 #include "asmlgen/application/dataset/transient_dataset_entry.h"
