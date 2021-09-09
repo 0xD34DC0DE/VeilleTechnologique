@@ -1,4 +1,4 @@
-#include "asmlgen/application/dataset/file_loader.h"
+#include "asmlgen/application/dataset/file_reader.h"
 
 #include <fstream>
 
@@ -7,7 +7,8 @@ namespace dataset
 
 std::vector<char> FileReader::ReadFile(const std::string& filepath)
 {
-  std::ifstream inputStream(filepath);
+  std::ifstream inputStream;
+  inputStream.open(filepath);
 
   if (inputStream.is_open())
   {
