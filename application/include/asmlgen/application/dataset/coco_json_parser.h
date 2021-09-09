@@ -48,6 +48,7 @@ private:
 
   static std::unordered_map<uint64_t, TransientCocoEntry> GenerateTransientEntries(const AnnotationMap& annotations);
 };
+
 } // namespace dataset
 
 #endif
