@@ -16,6 +16,7 @@ class TransientDatasetEntry
 {
 public:
   TransientDatasetEntry() = default;
+  virtual ~TransientDatasetEntry() = default;
 
   [[nodiscard]] uint32_t GetImageWidth() const noexcept;
   [[nodiscard]] uint32_t GetImageHeight() const noexcept;

@@ -16,13 +16,14 @@ public:
   using ClassNameGroupMap = std::unordered_map<std::string, std::vector<std::string>>;
 
   DatasetJsonParser() = default;
+  virtual ~DatasetJsonParser() = default;
 
   // Takes in a char vector representing the json file and returns the number of elements processed
   // Needs to be implemented for a given dataset
   virtual uint64_t LoadJson(const std::vector<char>& json) = 0;
 
   // Get the processed items
-  [[nodiscard]] const std::vector<T>& Entries() const noexcept;
+  [[nodiscard]] const std::vector<TransientDatasetEntry>& Entries() const noexcept;
 
   // Get the map of category names grouped into classes
   [[nodiscard]] const ClassNameGroupMap& ClassNameGroups() const noexcept;

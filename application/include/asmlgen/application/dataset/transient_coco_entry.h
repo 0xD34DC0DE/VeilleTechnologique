@@ -11,6 +11,7 @@ class TransientCocoEntry : public TransientDatasetEntry
 {
 public:
   TransientCocoEntry() = default;
+  ~TransientCocoEntry() override = default;
 
   ///
   /// Retrieve the data if there is a need to. Example: downloading, query a local database
