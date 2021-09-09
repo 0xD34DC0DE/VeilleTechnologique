@@ -21,6 +21,46 @@ uint64_t CocoJsonParser::LoadJson(const std::vector<char>& json)
   LinkCategoriesToAnnotations(annotations, categories);
 
   class_name_groups_ = CreateClassNameGroups(categories);
+
+  const std::unordered_map<uint64_t, TransientCocoEntry> transient_entries = GenerateTransientEntries(annotations);
+
+  for (const auto& id_transient_entry_pair : transient_entries)
+  {
+    entries_.emplace_back(id_transient_entry_pair.second);
+  }
+
+  return entries_.size();
+}
+
+std::unordered_map<uint64_t, TransientCocoEntry> CocoJsonParser::GenerateTransientEntries(
+  const CocoJsonParser::AnnotationMap& annotations)
+{
+  std::unordered_map<uint64_t, TransientCocoEntry> transient_entries;
+  for (const auto& id_annotation_pair : annotations)
+  {
+    auto transient_entry_iter = transient_entries.find(id_annotation_pair.second.imageId);
+    if (transient_entry_iter == transient_entries.end())
+    {
+      TransientCocoEntry transient_coco_entry = TransientCocoEntry();
+      const COCOImage* coco_image = id_annotation_pair.second.cocoImagePtr;
+
+      transient_coco_entry.image_width_ = coco_image->width;
+      transient_coco_entry.image_height_ = coco_image->height;
+      transient_coco_entry.image_url_ = coco_image->COCOUrl;
+
+      transient_coco_entry.annotation_segmentations_data.emplace_back(
+        id_annotation_pair.second.category_name, id_annotation_pair.second.segmentation);
+
+      transient_entries[id_annotation_pair.second.imageId] = transient_coco_entry;
+    }
+    else
+    {
+      transient_entry_iter->second.annotation_segmentations_data.emplace_back(
+        id_annotation_pair.second.category_name, id_annotation_pair.second.segmentation);
+    }
+  }
+
+  return transient_entries;
 }
 
 CocoJsonParser::AnnotationMap CocoJsonParser::ParseAnnotations(const rapidjson::Document* document)

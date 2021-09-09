@@ -46,9 +46,7 @@ private:
 
   static DatasetJsonParser<TransientCocoEntry>::ClassNameGroupMap CreateClassNameGroups(const CategoryMap& categories);
 
-  AnnotationMap annotations_;
-  ImageMap images_;
-  CategoryMap categories_;
+  static std::unordered_map<uint64_t, TransientCocoEntry> GenerateTransientEntries(const AnnotationMap& annotations);
 };
 } // namespace dataset
 
