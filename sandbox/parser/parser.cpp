@@ -19,7 +19,7 @@ int main(int, char**)
     FileReader::ReadFile(R"(C:\Users\0xD34DC0DE\PycharmProjects\PersonSegmentation\instances_val2017.json)");
   std::cout << "Json loaded: " << json.size() << " bytes" << std::endl;
 
-  std::cout << "Entry loading entries" << std::endl;
+  std::cout << "Loading entries" << std::endl;
 
   std::unique_ptr<DatasetJsonParser<TransientCocoEntry>> coco_json_parser_ptr = std::make_unique<CocoJsonParser>();
   uint64_t entry_count = coco_json_parser_ptr->LoadJson(json);
