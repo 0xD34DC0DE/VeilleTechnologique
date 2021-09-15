@@ -30,6 +30,8 @@ public:
 
   void SetCompletionCallback(std::function<void(std::size_t)>&& completion_callback);
 
+  void SetUrl(std::string url);
+
 private:
   std::string url_;
   std::size_t required_resource_ {};

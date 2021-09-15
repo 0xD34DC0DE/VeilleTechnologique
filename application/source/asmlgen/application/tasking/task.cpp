@@ -68,4 +68,9 @@ void Task::SetCompletionCallback(std::function<void(std::size_t)>&& completion_c
   completion_callback_ = std::move(completion_callback);
 }
 
+void Task::SetUrl(std::string url)
+{
+  url_ = std::move(url);
+}
+
 } // namespace tasking

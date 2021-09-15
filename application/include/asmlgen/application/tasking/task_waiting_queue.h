@@ -29,6 +29,8 @@ public:
 
   bool IsEmpty();
 
+  uint64_t WaitingTaskCount();
+
 private:
   uint32_t waiting_task_count_;
   std::queue<Task> task_queue_;

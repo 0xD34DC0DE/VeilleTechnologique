@@ -2,8 +2,8 @@
 
 #include <utility>
 
-#include "asmlgen/application/tasking/orchestrator.h"
 #include "asmlgen/application/config/assertion.h"
+#include "asmlgen/application/tasking/orchestrator.h"
 
 namespace tasking
 {
@@ -37,6 +37,12 @@ bool TaskWaitingQueue::IsEmpty()
 {
   std::scoped_lock<std::mutex> task_queue_lock(task_queue_mutex);
   return task_queue_.empty();
+}
+
+uint64_t TaskWaitingQueue::WaitingTaskCount()
+{
+  std::scoped_lock<std::mutex> task_queue_lock(task_queue_mutex);
+  return task_queue_.size();
 }
 
 } // namespace tasking
