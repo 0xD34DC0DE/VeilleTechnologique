@@ -28,20 +28,11 @@ public:
 
   [[nodiscard]] std::size_t GetRequiredResources() const;
 
-  void SetCompletionCallback(std::function<void(std::size_t)>&& completion_callback);
+  void SetCompletionCallback(std::function<void(std::size_t, uint64_t)>&& completion_callback);
 
   void SetUrl(std::string url);
 
-private:
-  std::string url_;
-  std::size_t required_resource_ {};
-  std::unique_ptr<std::jthread> thread_ptr_;
-
-  // TODO Optimise to reference of function that will be created when constructing the orchestrator to avoid recreating
-  // std::function's
-  std::function<void(std::size_t)> completion_callback_;
-
-  void Run();
+  uint64_t GetId() const;
 
   ///
   /// Work to be executed before Run()
@@ -49,6 +40,21 @@ private:
   /// @note Not managed by the orchestrator since it shouldn't use resources
   ///
   void RunPrologue();
+
+private:
+  static uint64_t next_id_;
+  uint64_t id_;
+  std::string url_;
+  std::size_t required_resource_ {};
+  std::unique_ptr<std::jthread> thread_ptr_;
+
+  std::vector<uint8_t> bytes_;
+
+  // TODO Optimise to reference of function that will be created when constructing the orchestrator to avoid recreating
+  // std::function's
+  std::function<void(std::size_t, uint64_t)> completion_callback_;
+
+  void Run();
 
   void Done();
 };

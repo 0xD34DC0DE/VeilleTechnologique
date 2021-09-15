@@ -33,6 +33,10 @@ public:
   ///
   bool IsDone();
 
+  void RejoinPool(Task&& task);
+
+  TaskWaitingQueue* GetTaskWaitingQueuePtr();
+
 private:
   bool is_running_;
 
@@ -44,7 +48,6 @@ private:
   std::vector<Task> tasks_;
 
   std::mutex task_pool_mutex;
-  void RejoinPool(Task&& task);
 };
 
 } // namespace tasking

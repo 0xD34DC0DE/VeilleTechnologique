@@ -13,19 +13,28 @@ namespace tasking
 {
 
 class TaskWaitingQueue; // Forward declare to avoid recursive inclusion
+class TaskPool; // Forward declare to avoid recursive inclusion
 
 class Orchestrator
 {
 public:
-  Orchestrator(const std::size_t& max_resource, TaskWaitingQueue& waiting_queue);
+  Orchestrator(const std::size_t& max_resource);
+
+  void SetTaskPool(TaskPool* task_pool_ptr);
+
+  void SetTaskWaitingQueue(TaskWaitingQueue* waiting_queue);
 
   /// Tell the orchestrator that new tasks are ready to be pulled from the waiting queue
   void SignalNewTask();
 
-private:
-  std::atomic_size_t available_resources_;
-  TaskWaitingQueue& waiting_queue_;
+  bool IsReady();
 
+private:
+  std::size_t available_resources_;
+  TaskWaitingQueue* waiting_queue_;
+  TaskPool* task_pool_ptr_;
+
+  bool is_ready_ = false;
   // Next task to be started
   Task parked_task_;
   bool is_task_parked_;
@@ -67,7 +76,7 @@ private:
   ///
   /// Used by running task to signal their completion and the resource they release
   ///
-  void SignalTaskDone(std::size_t resources_released);
+  void SignalTaskDone(std::size_t resources_released, uint64_t task_id);
 };
 
 } // namespace tasking
