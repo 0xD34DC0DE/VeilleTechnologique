@@ -14,6 +14,7 @@ int main(int, char**)
 {
 
   using namespace tasking;
+
   std::vector<std::string> urls { "/val2017/000000114907.jpg",
     "/val2017/000000115245.jpg",
     "/val2017/000000437898.jpg",

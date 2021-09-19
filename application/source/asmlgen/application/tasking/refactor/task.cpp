@@ -3,4 +3,4 @@
 namespace tasking
 {
 
-}
+} // namespace tasking
