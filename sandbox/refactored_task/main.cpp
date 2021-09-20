@@ -114,6 +114,65 @@ struct callable2
   using OutputType = int;
 };
 
+// REFACTOR
+
+template<typename... Chainables>
+struct GetOutputTypeOfLast
+{
+  using OutputType =
+    typename std::tuple_element<sizeof...(Chainables) - 1, std::tuple<Chainables...>>::type::OutputType;
+};
+
+template<typename... Chainables>
+struct GetInputTypeOfFirst
+{
+  using InputType = typename std::tuple_element<0, std::tuple<Chainables...>>::type::InputType;
+};
+
+template<typename Chainable>
+constexpr auto CallNext(typename Chainable::InputType& input, Chainable function)
+{
+  return function.Call(input);
+}
+
+template<typename Chainable, typename... Chainables>
+constexpr auto CallNext(typename Chainable::InputType& input, Chainable function, Chainables... next_functions)
+{
+  auto output = function.Call(input);
+  CallNext(output, next_functions...);
+}
+
+template<typename InputType, typename ChainableTuple, std::size_t... Indices>
+constexpr auto UnpackChainableTupleAndStartChain(
+  InputType input, ChainableTuple& chainable_tuple, std::index_sequence<Indices...>)
+{
+  return CallNext(input, std::get<Indices...>(chainable_tuple));
+}
+
+template<typename InputType, typename ChainableTuple>
+constexpr auto StartChain(InputType input, ChainableTuple& chainable_tuple)
+{
+  return UnpackChainableTupleAndStartChain(
+    input, chainable_tuple, std::make_index_sequence<std::tuple_size<ChainableTuple>::value> {});
+}
+
+template<typename... Chainables>
+struct Chained
+{
+
+  using InputType = typename GetInputTypeOfFirst<Chainables...>::InputType;
+  using OutputType = typename GetOutputTypeOfLast<Chainables...>::OutputType;
+
+  explicit Chained(Chainables... chainables) : functions(chainables...) {};
+
+  OutputType Start(InputType input)
+  {
+    return StartChain(input, functions);
+  }
+
+  std::tuple<Chainables...> functions;
+};
+
 int main(int, char**)
 {
   auto f1 = callable1();
