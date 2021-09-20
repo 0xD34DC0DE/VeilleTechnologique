@@ -23,6 +23,7 @@ using namespace tasking;
 // public:
 //   void Work(int&) {}
 // };
+// https://gist.github.com/leopoldcambier/1f5b92b0afc8754e40f7faa6b9bd8afc
 
 template<typename... Types>
 struct InputTypeList
@@ -130,7 +131,7 @@ struct GetInputTypeOfFirst
 };
 
 template<typename Chainable>
-constexpr auto CallNext(typename Chainable::InputType& input, Chainable function)
+constexpr typename Chainable::OutputType CallNext(typename Chainable::InputType& input, Chainable function)
 {
   return function.Call(input);
 }
@@ -146,7 +147,7 @@ template<typename InputType, typename ChainableTuple, std::size_t... Indices>
 constexpr auto UnpackChainableTupleAndStartChain(
   InputType input, ChainableTuple& chainable_tuple, std::index_sequence<Indices...>)
 {
-  return CallNext(input, std::get<Indices...>(chainable_tuple));
+  return CallNext(input, std::get<Indices>(chainable_tuple)...);
 }
 
 template<typename InputType, typename ChainableTuple>
@@ -165,20 +166,56 @@ struct Chained
 
   explicit Chained(Chainables... chainables) : functions(chainables...) {};
 
+  std::tuple<Chainables...> functions;
+
   OutputType Start(InputType input)
   {
     return StartChain(input, functions);
   }
+};
 
-  std::tuple<Chainables...> functions;
+template<typename... Chainables>
+constexpr auto MakeChained(Chainables... chainables)
+{
+  return Chained(chainables...);
+}
+
+struct chainable1
+{
+  std::string Call(bool b)
+  {
+    if (b) { return "1"; }
+    else
+    {
+      return "A";
+    }
+  }
+
+  using InputType = bool;
+  using OutputType = std::string;
+};
+
+struct chainable2
+{
+  int Call(std::string s)
+  {
+    if (s == "1") { return 1; }
+    else
+    {
+      return 0;
+    }
+  }
+
+  using InputType = std::string;
+  using OutputType = int;
 };
 
 int main(int, char**)
 {
-  auto f1 = callable1();
-  auto f2 = callable2();
-  auto chain = MakeChainedCalls(f1, f2);
+  auto f1 = chainable1();
+  auto f2 = chainable2();
+  auto chain = MakeChained(f1, f2);
 
-  std::cout << chain.Call(true) << std::endl;
-  std::cout << chain.Call(false) << std::endl;
+  std::cout << chain.Start(true) << std::endl;
+  std::cout << chain.Start(false) << std::endl;
 }
