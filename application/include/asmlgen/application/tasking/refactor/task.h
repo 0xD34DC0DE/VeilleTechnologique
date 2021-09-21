@@ -11,12 +11,6 @@
 namespace tasking
 {
 
-template<template<typename Input, typename Output> class T, typename Input, typename Output>
-concept Chainable = requires(T<Input, Output> task)
-{
-  { task.Start(Input {}) };
-};
-
 template<typename R, typename... A>
 R ret(R (*)(A...));
 

@@ -26,68 +26,67 @@ using namespace tasking;
 
 // REFACTOR
 
-template<typename... Chainables>
+template<typename... ChainObjs>
 struct GetOutputTypeOfLast
 {
-  using OutputType =
-    typename std::tuple_element<sizeof...(Chainables) - 1, std::tuple<Chainables...>>::type::OutputType;
+  using OutputType = typename std::tuple_element<sizeof...(ChainObjs) - 1, std::tuple<ChainObjs...>>::type::OutputType;
 };
 
-template<typename... Chainables>
+template<typename... ChainObjs>
 struct GetInputTypeOfFirst
 {
-  using InputType = typename std::tuple_element<0, std::tuple<Chainables...>>::type::InputType;
+  using InputType = typename std::tuple_element<0, std::tuple<ChainObjs...>>::type::InputType;
 };
 
-template<typename Chainable>
-constexpr typename Chainable::OutputType CallNext(typename Chainable::InputType& input, Chainable function)
+template<typename ChainObj>
+constexpr typename ChainObj::OutputType CallNext(typename ChainObj::InputType& input, ChainObj function)
 {
   return function.Call(input);
 }
 
-template<typename Chainable>
-constexpr typename Chainable::OutputType EndChain(typename Chainable::InputType& input, Chainable function)
+template<typename ChainObj>
+constexpr typename ChainObj::OutputType EndChain(typename ChainObj::InputType& input, ChainObj function)
 {
   return function.Call(input);
 }
 
-template<typename Chainable, typename... Chainables>
-constexpr typename GetOutputTypeOfLast<Chainable, Chainables...>::OutputType CallNext(
-  typename Chainable::InputType& input, Chainable function, Chainables... next_functions)
+template<typename ChainObj, typename... ChainObjs>
+constexpr typename GetOutputTypeOfLast<ChainObj, ChainObjs...>::OutputType CallNext(
+  typename ChainObj::InputType& input, ChainObj function, ChainObjs... next_functions)
 {
   auto output = function.Call(input);
 
-  if constexpr (sizeof...(Chainables) > 0) { return CallNext(output, next_functions...); }
+  if constexpr (sizeof...(ChainObjs) > 0) { return CallNext(output, next_functions...); }
   else
   {
     return EndChain(output, next_functions...);
   }
 }
 
-template<typename InputType, typename ChainableTuple, std::size_t... Indices>
-constexpr auto UnpackChainableTupleAndStartChain(
-  InputType input, ChainableTuple& chainable_tuple, std::index_sequence<Indices...>)
+template<typename InputType, typename ChainObjTuple, std::size_t... Indices>
+constexpr auto UnpackChainObjTupleAndStartChain(
+  InputType input, ChainObjTuple& chainable_tuple, std::index_sequence<Indices...>)
 {
   return CallNext(input, std::get<Indices>(chainable_tuple)...);
 }
 
-template<typename InputType, typename ChainableTuple>
-constexpr auto StartChain(InputType input, ChainableTuple& chainable_tuple)
+template<typename InputType, typename ChainObjTuple>
+constexpr auto StartChain(InputType input, ChainObjTuple& chainable_tuple)
 {
-  return UnpackChainableTupleAndStartChain(
-    input, chainable_tuple, std::make_index_sequence<std::tuple_size<ChainableTuple>::value> {});
+  return UnpackChainObjTupleAndStartChain(
+    input, chainable_tuple, std::make_index_sequence<std::tuple_size<ChainObjTuple>::value> {});
 }
 
-template<typename... Chainables>
-struct Chained
+template<typename... ChainObjs>
+struct ChainedObjs
 {
 
-  using InputType = typename GetInputTypeOfFirst<Chainables...>::InputType;
-  using OutputType = typename GetOutputTypeOfLast<Chainables...>::OutputType;
+  using InputType = typename GetInputTypeOfFirst<ChainObjs...>::InputType;
+  using OutputType = typename GetOutputTypeOfLast<ChainObjs...>::OutputType;
 
-  explicit Chained(Chainables... chainables) : functions(chainables...) {};
+  explicit ChainedObjs(ChainObjs... chainables) : functions(chainables...) {};
 
-  std::tuple<Chainables...> functions;
+  std::tuple<ChainObjs...> functions;
 
   OutputType Start(InputType input)
   {
@@ -95,13 +94,60 @@ struct Chained
   }
 };
 
-template<typename... Chainables>
-constexpr auto MakeChained(Chainables... chainables)
+template<typename T>
+concept HasChainTypes = requires(T obj)
 {
-  return Chained(chainables...);
+  { T::InputType };
+  { T::OutputType };
+};
+
+// template<class...>
+// struct types
+//{
+//   using type = types;
+// };
+//
+// template<class Sig>
+// struct args;
+// template<class R, class... Args>
+// struct args<R(Args...)> : types<Args...>
+//{};
+// template<class Sig>
+// using args_t = typename args<Sig>::type;
+
+template<typename T>
+concept IsChainCallable = requires(T obj)
+{
+  {
+    obj.Call(std::declval<T::InputType>())
+    } -> std::same_as<typename T::OutputType>;
+};
+
+template<typename T>
+concept IsChainable = requires
+{
+  HasChainTypes<T>&& IsChainCallable<T>;
+};
+
+template<typename... ChainObjs>
+constexpr auto MakeChained(ChainObjs... chainables)
+{
+  return ChainedObjs(chainables...);
 }
 
-struct chainable1
+template<typename TChild, typename Output_T, typename Input_T>
+// requires IsChainCallable<TChild>
+struct MakeChainObj
+{
+
+  using InputType = Input_T;
+  using OutputType = Output_T;
+
+  // private:
+  constexpr void verifier_() requires IsChainable<TChild> {};
+};
+
+struct chainable1 : MakeChainObj<chainable1, std::string, bool>
 {
   std::string Call(bool b)
   {
@@ -111,12 +157,9 @@ struct chainable1
       return "A";
     }
   }
-
-  using InputType = bool;
-  using OutputType = std::string;
 };
 
-struct chainable2
+struct chainable2 : MakeChainObj<chainable1, int, std::string>
 {
   int Call(std::string s)
   {
@@ -126,19 +169,18 @@ struct chainable2
       return 0;
     }
   }
-
-  using InputType = std::string;
-  using OutputType = int;
 };
 
 int main(int, char**)
 {
   auto f1 = chainable1();
   auto f2 = chainable2();
+  f1.verifier_();
+
   auto chain = MakeChained(f1, f2);
 
   std::cout << chain.Start(true) << std::endl;
   std::cout << chain.Start(false) << std::endl;
 }
 
-// 9:17
+// 9:17 to 12:00
