@@ -25,3 +25,5 @@ add_sandbox_project(parser)
 add_sandbox_project(async)
 
 add_sandbox_project(refactored_task)
+
+add_sandbox_project(refactor_task_test)
