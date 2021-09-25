@@ -24,7 +24,7 @@ public:
   void Start();
 
   ///
-  /// Stop dispatching tasks
+  /// Terminate dispatching tasks
   ///
   void Stop();
 

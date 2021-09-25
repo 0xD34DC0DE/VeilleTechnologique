@@ -2,14 +2,17 @@
 
 #include "asmlgen/application/dataset/coco_json_parser.h"
 #include "asmlgen/application/dataset/file_reader.h"
+#include "asmlgen/application/tasking/refactor/call_chain.h"
 
 #define SFML_STATIC
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
 
 #include <memory>
+#include <thread>
 
 using namespace dataset;
+
 
 int main(int, char**)
 {
@@ -23,6 +26,17 @@ int main(int, char**)
 
   std::unique_ptr<DatasetJsonParser<TransientCocoEntry>> coco_json_parser_ptr = std::make_unique<CocoJsonParser>();
   uint64_t entry_count = coco_json_parser_ptr->LoadJson(json);
+
+  //  std::vector<std::jthread> threads;
+  //
+  //    for (int i = 0; i < 20; ++i)
+  //    {
+  //      std::string url = coco_json_parser_ptr->[i].GetUrl();
+  //      threads.emplace_back(
+  //        [] {
+  //
+  //        });
+  //    }
 
   std::cout << "Entry loaded: " << entry_count << std::endl;
 

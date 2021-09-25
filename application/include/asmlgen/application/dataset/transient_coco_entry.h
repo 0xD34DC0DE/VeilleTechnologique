@@ -29,6 +29,11 @@ public:
   ///
   void ProcessData() override;
 
+  std::string GetURL()
+  {
+    return image_url_;
+  } // TODO TMP
+
 protected:
   // Coco dataset format implementation types and function used by friend parser class
   uint32_t image_width_ {};

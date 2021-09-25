@@ -52,7 +52,7 @@ void TaskPool::Start()
 void TaskPool::Stop()
 {
   std::scoped_lock<std::mutex> lock(task_pool_mutex);
-  std::cout << "Task Pool: Stop" << std::endl;
+  std::cout << "Task Pool: Terminate" << std::endl;
   is_running_ = false;
 }
 

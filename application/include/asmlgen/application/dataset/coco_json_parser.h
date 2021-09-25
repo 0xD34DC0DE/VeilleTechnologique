@@ -24,6 +24,8 @@ public:
 
   uint64_t LoadJson(const std::vector<char>& json) override;
 
+  std::vector<std::string> urls; // TODO TMP
+
 private:
   using AnnotationMap = std::unordered_map<uint64_t, COCOAnnotation>;
   using ImageMap = std::unordered_map<uint64_t, COCOImage>;
