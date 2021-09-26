@@ -57,23 +57,6 @@ constexpr auto StartChain(InputType input, ChainObjTuple& chainable_tuple)
     input, chainable_tuple, std::make_index_sequence<std::tuple_size<ChainObjTuple>::value> {});
 }
 
-template<typename... ChainObjs>
-struct ChainedObjs
-{
-
-  using InputType = typename GetInputTypeOfFirst<ChainObjs...>::InputType;
-  using OutputType = typename GetOutputTypeOfLast<ChainObjs...>::OutputType;
-
-  explicit ChainedObjs(ChainObjs... chainables) : functions(chainables...) {};
-
-  std::tuple<ChainObjs...> functions;
-
-  OutputType Start(InputType input)
-  {
-    return StartChain(input, functions);
-  }
-};
-
 template<typename T>
 concept HasChainTypes = requires(T obj)
 {
@@ -94,6 +77,22 @@ concept Chainable = requires
 {
   { HasChainTypes<T> };
   { IsChainCallable<T> };
+};
+
+template<Chainable... ChainObjs>
+struct ChainedObjs
+{
+  using InputType = typename GetInputTypeOfFirst<ChainObjs...>::InputType;
+  using OutputType = typename GetOutputTypeOfLast<ChainObjs...>::OutputType;
+
+  explicit ChainedObjs(ChainObjs... chainables) : functions(chainables...) {};
+
+  std::tuple<ChainObjs...> functions;
+
+  OutputType Start(InputType input)
+  {
+    return StartChain(input, functions);
+  }
 };
 
 template<typename... ChainObjs>
