@@ -18,14 +18,9 @@ class ReusableThread
 public:
   ReusableThread() = default;
 
-  ReusableThread(Chain&& chain, std::function<void(typename Chain::OutputType)>&& done_callback)
+  ReusableThread(Chain&& chain, std::function<void(std::thread::id, typename Chain::OutputType)>&& done_callback)
     : chain_(std::move(chain)), state_(State::Waiting), done_callback_(done_callback),
       thread_(std::jthread(&ReusableThread<Chain>::Loop, this)) {};
-
-  void SetDoneCallback(std::function<void(typename Chain::OutputType)>&& done_callback)
-  {
-    done_callback_ = std::move(done_callback);
-  };
 
   void Start(typename Chain::InputType input)
   {
@@ -46,8 +41,6 @@ public:
   [[nodiscard]] bool IsDone()
   {
     std::scoped_lock<std::mutex> lock(mutex_);
-    int a = state_ & State::Waiting;
-    (void)(a);
     return state_ & State::Waiting;
   };
 
@@ -57,12 +50,17 @@ public:
     return state_ & State::Running;
   };
 
+  [[nodiscard]] std::thread::id GetThreadId()
+  {
+    return thread_.get_id();
+  }
+
 private:
   std::jthread thread_;
   std::mutex mutex_;
   std::condition_variable_any condition_variable_;
 
-  std::function<void(typename Chain::OutputType)> done_callback_;
+  std::function<void(std::thread::id, typename Chain::OutputType)> done_callback_;
 
   Chain chain_;
   typename Chain::InputType chain_input_;
@@ -88,7 +86,7 @@ private:
       state_ = static_cast<State>(state_ & ~State::Running);
       state_ = static_cast<State>(state_ | State::Waiting);
     }
-    done_callback_(result);
+    done_callback_(thread_.get_id(), result);
   };
 
   void Loop()
