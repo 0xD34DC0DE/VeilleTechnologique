@@ -2,61 +2,74 @@
 #define ASMLGEN_TASK_H
 
 #include <functional>
-#include <thread>
+#include <memory>
+#include <optional>
+#include <type_traits>
+#include <typeinfo>
+#include <utility>
 
 namespace tasking
 {
 
-// TODO make task accept lambdas to run instead of hardcoded Run() and RunPrologue()
-class Orchestrator;
+template<typename R, typename... A>
+R ret(R (*)(A...));
 
+template<typename C, typename R, typename... A>
+R ret(R (C::*)(A...));
+
+template<typename InputType, typename OutputType>
 class Task
 {
-public:
-  Task() = default;
-  explicit Task(std::string url);
-
-  Task(Task&& other) noexcept;
-  Task& operator=(Task&& rhs) noexcept;
-
-  Task(const Task&) = delete;
-  Task& operator=(const Task&) = delete;
-
-  ~Task() = default;
-
-  void RunTask();
-
-  [[nodiscard]] std::size_t GetRequiredResources() const;
-
-  void SetCompletionCallback(std::function<void(std::size_t, uint64_t)>&& completion_callback);
-
-  void SetUrl(std::string url);
-
-  uint64_t GetId() const;
-
-  ///
-  /// Work to be executed before Run()
-  ///
-  /// @note Not managed by the orchestrator since it shouldn't use resources
-  ///
-  void RunPrologue();
-
-private:
-  static uint64_t next_id_;
-  uint64_t id_;
-  std::string url_;
-  std::size_t required_resource_ {};
-  std::unique_ptr<std::jthread> thread_ptr_;
-
-  std::vector<uint8_t> bytes_;
-
-  // TODO Optimise to reference of function that will be created when constructing the orchestrator to avoid recreating
-  // std::function's
-  std::function<void(std::size_t, uint64_t)> completion_callback_;
-
-  void Run();
-
-  void Done();
+  // public:
+  //   Task() = default;
+  //   virtual ~Task() = default;
+  //
+  //   template<template<typename, typename> typename Task_T, typename T>
+  //   Task<OutputType, T> Then(Task_T<OutputType, T> a)
+  //   {
+  //     f_ = [a] { Task_T<OutputType, T> v = a.Start({}); };
+  //     //    next_task_ = std::move(next);
+  //     //    return next_task_;
+  //     return Task<OutputType, T> {};
+  //   }
+  //
+  //   void Start(InputType input);
+  //   //  {
+  //   //    Work(input);
+  //   //    Done();
+  //   //  }
+  //   //
+  //   //  virtual void Work(InputType& input) = 0;
+  //
+  //   //  void Done()
+  //   //  {
+  //   //    if (next_task_.has_value()) { next_task_.value().Start(output_); }
+  //   //  }
+  //   //
+  //   //  auto GetResultFromLast()
+  //   //  {
+  //   //    if (next_task_.has_value()) { return GetResultFromLast(); }
+  //   //    else
+  //   //    {
+  //   //      return output_;
+  //   //    }
+  //   //  }
+  //
+  // protected:
+  //   OutputType output_;
+  //
+  // private:
+  //   bool has_next_ = false;
+  //   std::function<void()> f_;
+  //
+  //   auto GetResultFromLast(Task& next)
+  //   {
+  //     if (next.next_task_.has_value()) { return GetResultFromLast(next.next_task_.value()); }
+  //     else
+  //     {
+  //       output_;
+  //     }
+  //   }
 };
 
 } // namespace tasking

@@ -1,8 +1,12 @@
-#include "asmlgen/application/tasking/refactor/task_manager.h"
+#include "asmlgen/application/tasking/task_manager.h"
+
+#include "asmlgen/application/config/assertion.h"
 
 #define SFML_STATIC
 #include <SFML/Network.hpp>
 
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 
 using namespace tasking;
@@ -26,11 +30,13 @@ class FetchDownloadSize : public MakeChainObj<FetchDownloadSize, DownloadInfo, D
 public:
   DownloadInfo Call(DownloadTask download_task)
   {
-
     auto host_and_resource = SplitHostAndResource(download_task.image_url);
-    DownloadInfo download_info = {
-      host_and_resource.first, host_and_resource.second, 0, download_task.output_filepath
-    };
+
+    DownloadInfo download_info = { std::move(host_and_resource.first),
+      std::move(host_and_resource.second),
+      0,
+      std::move(download_task.output_filepath) };
+
     std::cout << "starting fetch" << std::endl;
 
     sf::Http http(download_info.host);
@@ -66,7 +72,7 @@ public:
     {
       std::cout << "starting download" << std::endl;
 
-      DownloadedImage downloaded_image { download_info.output_filepath,
+      DownloadedImage downloaded_image { std::move(download_info.output_filepath),
         std::move(std::vector<uint8_t>(download_info.download_size)) };
 
       sf::Http http(download_info.host);
@@ -87,8 +93,39 @@ public:
   }
 };
 
+class WriteImage : public MakeChainObj<WriteImage, bool, DownloadedImage>
+{
+public:
+  bool Call(DownloadedImage downloaded_image)
+  {
+    if (!downloaded_image.output_filepath.empty())
+    {
+      std::cout << "starting writing" << std::endl;
+
+      if (!std::filesystem::exists(downloaded_image.output_filepath))
+      {
+        std::ofstream output_file_stream(downloaded_image.output_filepath, std::ios::out | std::ios::binary);
+        if (!output_file_stream)
+        {
+          ASSERT(false, std::string("Could not write file to path: ").append(downloaded_image.output_filepath));
+        }
+
+        output_file_stream.write(
+          reinterpret_cast<const char*>(downloaded_image.image_bytes.data()), downloaded_image.image_bytes.size());
+        return true;
+      }
+    }
+    else
+    {
+      std::cout << "Skipping write, empty output_filepath" << std::endl;
+    }
+    return false;
+  }
+};
+
 int main(int, char**)
 {
+  std::string output_directory_path = "C:/Users/0xD34DC0DE/Pictures/ASMLGen/output_test";
   std::vector<std::string> urls { "http://images.cocodataset.org/val2017/000000114907.jpg",
     "http://images.cocodataset.org/val2017/000000115245.jpg",
     "http://images.cocodataset.org/val2017/000000437898.jpg",
@@ -98,8 +135,16 @@ int main(int, char**)
     "http://images.cocodataset.org/val2017/000000149222.jpg",
     "http://images.cocodataset.org/val2017/000000507081.jpg" };
 
-  TaskManager task_manager = TaskManager<FetchDownloadSize>(2);
-  task_manager.SetInputs(urls);
+  std::vector<DownloadTask> download_tasks;
+
+  for (const auto& url : urls)
+  {
+    std::string output_path = output_directory_path + url.substr(url.find_last_of('/'), url.size());
+    download_tasks.push_back({ output_path, url });
+  }
+
+  TaskManager task_manager = TaskManager<FetchDownloadSize, DownloadImage, WriteImage>(2);
+  task_manager.SetInputs(download_tasks);
   task_manager.Start();
 
   while (!task_manager.AllTasksDone()) {}

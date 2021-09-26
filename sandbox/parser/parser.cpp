@@ -2,7 +2,7 @@
 
 #include "asmlgen/application/dataset/coco_json_parser.h"
 #include "asmlgen/application/dataset/file_reader.h"
-#include "asmlgen/application/tasking/refactor/call_chain.h"
+#include "asmlgen/application/tasking/call_chain.h"
 
 #define SFML_STATIC
 #include <SFML/Graphics.hpp>
@@ -12,7 +12,6 @@
 #include <thread>
 
 using namespace dataset;
-
 
 int main(int, char**)
 {
