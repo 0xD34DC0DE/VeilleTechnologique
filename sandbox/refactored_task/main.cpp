@@ -1,33 +1,41 @@
 #include "asmlgen/application/tasking/refactor/task_manager.h"
 
 #define SFML_STATIC
-#include <iostream>
 #include <SFML/Network.hpp>
 
+#include <iostream>
+
 using namespace tasking;
+
+struct DownloadTask
+{
+  std::string output_filepath;
+  std::string image_url;
+};
 
 struct DownloadInfo
 {
   std::string host;
   std::string resource;
   std::size_t download_size;
+  std::string output_filepath;
 };
 
-class FetchDownloadSize : public MakeChainObj<FetchDownloadSize, DownloadInfo, std::string>
+class FetchDownloadSize : public MakeChainObj<FetchDownloadSize, DownloadInfo, DownloadTask>
 {
 public:
-  FetchDownloadSize() = default;
-
-  DownloadInfo Call(std::string url)
+  DownloadInfo Call(DownloadTask download_task)
   {
 
-    auto host_and_resource = SplitHostAndResource(url);
-    DownloadInfo download_info = { host_and_resource.first, host_and_resource.second, 0 };
+    auto host_and_resource = SplitHostAndResource(download_task.image_url);
+    DownloadInfo download_info = {
+      host_and_resource.first, host_and_resource.second, 0, download_task.output_filepath
+    };
     std::cout << "starting fetch" << std::endl;
 
     sf::Http http(download_info.host);
     sf::Http::Request request(download_info.resource, sf::Http::Request::Head);
-    sf::Http::Response response = http.sendRequest(request, sf::seconds(1));
+    sf::Http::Response response = http.sendRequest(request, sf::seconds(2));
 
     download_info.download_size = std::stoul(response.getField("content-length"));
     return download_info;
@@ -40,6 +48,42 @@ private:
     std::size_t host_end = url.find_first_of('/', protocol_end);
 
     return { url.substr(0, host_end), url.substr(host_end) };
+  }
+};
+
+struct DownloadedImage
+{
+  std::string output_filepath;
+  std::vector<uint8_t> image_bytes;
+};
+
+class DownloadImage : public MakeChainObj<DownloadImage, DownloadedImage, DownloadInfo>
+{
+public:
+  DownloadedImage Call(DownloadInfo download_info)
+  {
+    if (download_info.download_size > 0)
+    {
+      std::cout << "starting download" << std::endl;
+
+      DownloadedImage downloaded_image { download_info.output_filepath,
+        std::move(std::vector<uint8_t>(download_info.download_size)) };
+
+      sf::Http http(download_info.host);
+      sf::Http::Request request(download_info.resource, sf::Http::Request::Get);
+      sf::Http::Response response = http.sendRequest(request, sf::seconds(2));
+
+      const std::string& body_str = response.getBody();
+
+      std::copy(body_str.begin(), body_str.end(), downloaded_image.image_bytes.begin());
+
+      return downloaded_image;
+    }
+    else
+    {
+      std::cout << "Failed to download: " << download_info.host << download_info.resource << std::endl;
+      return { "", {} };
+    }
   }
 };
 
