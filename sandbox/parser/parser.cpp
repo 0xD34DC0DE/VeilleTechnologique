@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "asmlgen/application/dataset/coco_json_parser.h"
+#include "asmlgen/application/coco_pipeline/coco_json_parser.h"
 #include "asmlgen/application/dataset/file_reader.h"
 #include "asmlgen/application/tasking/call_chain.h"
 
@@ -26,22 +26,7 @@ int main(int, char**)
   std::unique_ptr<DatasetJsonParser<TransientCocoEntry>> coco_json_parser_ptr = std::make_unique<CocoJsonParser>();
   uint64_t entry_count = coco_json_parser_ptr->LoadJson(json);
 
-  //  std::vector<std::jthread> threads;
-  //
-  //    for (int i = 0; i < 20; ++i)
-  //    {
-  //      std::string url = coco_json_parser_ptr->[i].GetUrl();
-  //      threads.emplace_back(
-  //        [] {
-  //
-  //        });
-  //    }
-
   std::cout << "Entry loaded: " << entry_count << std::endl;
-
-  sf::Http http("http://images.cocodataset.org/");
-  sf::Http::Request request("/val2017/000000114907.jpg", sf::Http::Request::Get);
-  sf::Http::Response response = http.sendRequest(request, sf::seconds(2));
 
   auto* window = new sf::RenderWindow(sf::VideoMode(512, 512), "Hello world");
 

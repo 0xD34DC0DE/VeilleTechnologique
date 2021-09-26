@@ -1,4 +1,4 @@
-#include "asmlgen/application/dataset/coco_json_parser.h"
+#include "asmlgen/application/coco_pipeline/coco_json_parser.h"
 
 #include "asmlgen/application/dataset/json_parsing_helpers.h"
 

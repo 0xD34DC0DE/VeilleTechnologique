@@ -1,7 +1,7 @@
 #ifndef ASMLGEN_TRANSIENT_COCO_ENTRY_H
 #define ASMLGEN_TRANSIENT_COCO_ENTRY_H
 
-#include "asmlgen/application/dataset/coco_dataset_types.h"
+#include "asmlgen/application/coco_pipeline/coco_dataset_types.h"
 #include "asmlgen/application/dataset/transient_dataset_entry.h"
 
 #include <cstdint>

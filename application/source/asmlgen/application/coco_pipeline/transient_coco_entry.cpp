@@ -1,4 +1,4 @@
-#include "asmlgen/application/dataset/transient_coco_entry.h"
+#include "asmlgen/application/coco_pipeline/transient_coco_entry.h"
 
 namespace dataset
 {
