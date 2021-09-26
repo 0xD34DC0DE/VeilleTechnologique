@@ -2,7 +2,7 @@
 #define ASMLGEN_REUSABLE_THREAD_H
 
 #include "asmlgen/application/config/assertion.h"
-#include "asmlgen/application/tasking/refactor/call_chain.h"
+#include "call_chain.h"
 
 #include <condition_variable>
 #include <functional>

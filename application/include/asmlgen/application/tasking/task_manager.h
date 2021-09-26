@@ -1,7 +1,7 @@
 #ifndef ASMLGEN_TASK_MANAGER_H
 #define ASMLGEN_TASK_MANAGER_H
 
-#include "asmlgen/application/tasking/refactor/reusable_thread.h"
+#include "reusable_thread.h"
 
 #include <iostream>
 #include <stack>
@@ -96,8 +96,6 @@ private:
     std::unique_lock lock(mutex_);
 
     waiting_reusable_treads_ids_.emplace(thread_id);
-    std::cout << "fetch size: " << std::dec << result.download_size << ", from: 0x" << std::hex << thread_id
-              << std::endl;
 
     outputs_.emplace_back(result);
 
