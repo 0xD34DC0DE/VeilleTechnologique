@@ -24,7 +24,10 @@ public:
   virtual uint64_t LoadJson(const std::vector<char>& json) = 0;
 
   // Get the processed items
-  [[nodiscard]] const std::vector<TransientDatasetEntry>& Entries() const noexcept;
+  [[nodiscard]] const std::vector<T>& Entries() const noexcept
+  {
+    return entries_;
+  };
 
   // Get the map of category names grouped into classes
   [[nodiscard]] const ClassNameGroupMap& ClassNameGroups() const noexcept;
