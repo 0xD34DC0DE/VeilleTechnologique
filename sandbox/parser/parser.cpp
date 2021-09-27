@@ -2,7 +2,9 @@
 
 #include "asmlgen/application/coco_pipeline/coco_json_parser.h"
 #include "asmlgen/application/dataset/file_reader.h"
-#include "asmlgen/application/tasking/call_chain.h"
+#include "asmlgen/application/tasking/task_manager.h"
+
+#include "asmlgen/application/generic_pipeline_utils/pipeline.h"
 
 #define SFML_STATIC
 #include <SFML/Graphics.hpp>
@@ -11,7 +13,9 @@
 #include <memory>
 #include <thread>
 
+using namespace tasking;
 using namespace dataset;
+using namespace pipeline;
 
 int main(int, char**)
 {
