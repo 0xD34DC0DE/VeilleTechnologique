@@ -27,7 +27,7 @@ int main(int, char**)
 
   std::cout << "Loading entries" << std::endl;
 
-  std::unique_ptr<DatasetJsonParser<TransientCocoEntry>> coco_json_parser_ptr = std::make_unique<CocoJsonParser>();
+  std::unique_ptr<CocoJsonParser> coco_json_parser_ptr = std::make_unique<CocoJsonParser>();
   uint64_t entry_count = coco_json_parser_ptr->LoadJson(json);
 
   std::cout << "Entry loaded: " << entry_count << std::endl;
