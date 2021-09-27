@@ -22,8 +22,9 @@ class TaskManager
 
 public:
   // Use max_threads 0 to use the maximum number of threads the implementation can support minus 2
-  TaskManager(uint32_t max_threads = 0)
+  TaskManager(std::function<void(bool)>&& completion_callback, uint32_t max_threads = 0)
     : all_task_done_(false), should_stop_(false), running_reusable_thread_count_(0),
+      completion_callback_(std::move(completion_callback)),
       thread_(std::jthread(&TaskManager<Chainables...>::Loop, this))
   {
     if (!max_threads)
@@ -88,6 +89,8 @@ private:
   std::vector<TaskReusableThreadPtr_T> reusable_threads_;
   std::stack<std::thread::id> waiting_reusable_treads_ids_;
   uint32_t running_reusable_thread_count_;
+
+  std::function<void(bool)> completion_callback_;
 
   std::jthread thread_;
   std::mutex mutex_;
@@ -161,6 +164,7 @@ private:
       Wait();
       StartNewTasks();
     }
+    completion_callback_(all_task_done_);
   }
 };
 
