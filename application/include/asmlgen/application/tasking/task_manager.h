@@ -9,15 +9,16 @@
 
 namespace tasking
 {
-
 template<Chainable... Chainables>
 class TaskManager
 {
   using Chain_T = decltype(MakeChained(std::declval<Chainables>()...));
   using TaskReusableThread_T = ReusableThread<Chain_T>;
   using TaskReusableThreadPtr_T = std::unique_ptr<TaskReusableThread_T>;
+  using IsInputTypePointer = std::is_pointer<typename Chain_T::InputType>;
+  using OriginalInput_T = typename Chain_T::InputType;
   using Output_T = typename Chain_T::OutputType;
-  using Input_T = typename Chain_T::InputType;
+  using Input_T = std::remove_pointer_t<OriginalInput_T>;
 
 public:
   // Use max_threads 0 to use the maximum number of threads the implementation can support minus 2
@@ -63,7 +64,11 @@ public:
     std::size_t initial_calls = std::min(reusable_threads_.size(), inputs_.size());
     for (std::size_t i = 0; i < initial_calls; ++i)
     {
-      reusable_threads_[i]->Start(inputs_[input_index++]);
+      if constexpr (IsInputTypePointer::value) { reusable_threads_[i]->Start(&inputs_[input_index++]); }
+      else
+      {
+        reusable_threads_[i]->Start(inputs_[input_index++]);
+      }
       ++running_reusable_thread_count_;
     }
   }
@@ -128,7 +133,13 @@ private:
         {
           if (reusable_thread_ptr->GetThreadId() == thread_id)
           {
-            reusable_thread_ptr->Start(inputs_[input_index++]);
+
+            if constexpr (IsInputTypePointer::value) { reusable_thread_ptr->Start(&inputs_[input_index++]); }
+            else
+            {
+              reusable_thread_ptr->Start(inputs_[input_index++]);
+            }
+
             ++running_reusable_thread_count_;
           }
         }
