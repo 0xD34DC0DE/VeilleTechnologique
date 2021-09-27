@@ -55,6 +55,11 @@ public:
     inputs_ = inputs;
   }
 
+  const std::vector<Output_T>& GetResults() const noexcept
+  {
+    return outputs_;
+  }
+
   void Start()
   {
     std::scoped_lock lock(mutex_);
