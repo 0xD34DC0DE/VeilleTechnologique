@@ -19,7 +19,7 @@ public:
   ReusableThread() = default;
 
   ReusableThread(Chain&& chain, std::function<void(std::thread::id, typename Chain::OutputType)>&& done_callback)
-    : chain_(std::move(chain)), state_(State::Waiting), done_callback_(done_callback),
+    : chain_(std::move(chain)), state_(State::Waiting), done_callback_(std::move(done_callback)),
       thread_(std::jthread(&ReusableThread<Chain>::Loop, this)) {};
 
   void Start(typename Chain::InputType input)
