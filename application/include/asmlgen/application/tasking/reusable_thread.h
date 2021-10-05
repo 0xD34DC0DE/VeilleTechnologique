@@ -20,7 +20,10 @@ public:
 
   ReusableThread(Chain&& chain, std::function<void(std::thread::id, typename Chain::OutputType)>&& done_callback)
     : chain_(std::move(chain)), state_(State::Waiting), done_callback_(std::move(done_callback)),
-      thread_(std::jthread(&ReusableThread<Chain>::Loop, this)) {};
+      thread_(std::jthread(&ReusableThread<Chain>::Loop, this))
+  {
+    stop_token_ = thread_.get_stop_token();
+  };
 
   void Start(typename Chain::InputType input)
   {
@@ -35,6 +38,7 @@ public:
   {
     std::unique_lock<std::mutex> lock(mutex_);
     state_ = static_cast<State>(state_ | State::Stop);
+    thread_.request_stop();
     condition_variable_.notify_one();
   };
 
@@ -59,6 +63,8 @@ private:
   std::jthread thread_;
   std::mutex mutex_;
   std::condition_variable_any condition_variable_;
+
+  std::stop_token stop_token_;
 
   std::function<void(std::thread::id, typename Chain::OutputType)> done_callback_;
 
@@ -98,13 +104,14 @@ private:
       auto result = RunChain();
       Done(result);
     }
+    return;
   };
 
   void Wait()
   {
     std::unique_lock<std::mutex> lock(mutex_);
 
-    condition_variable_.wait(lock, [this]() -> bool { return state_ & (State::Wake | State::Stop); });
+    condition_variable_.wait(lock, stop_token_, [this]() -> bool { return state_ & (State::Wake | State::Stop); });
     state_ = static_cast<State>(state_ & ~State::Wake);
   };
 };

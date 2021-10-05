@@ -21,7 +21,8 @@ public:
 
   // Takes in a char vector representing the json file and returns the number of elements processed
   // Needs to be implemented for a given dataset
-  virtual uint64_t LoadJson(const std::vector<char>& json) = 0;
+  virtual uint64_t LoadJson(
+    const std::vector<char>& json, const std::vector<std::string>& classes, const std::string& write_path) = 0;
 
   // Get the processed items
   [[nodiscard]] const std::vector<T>& Entries() const noexcept

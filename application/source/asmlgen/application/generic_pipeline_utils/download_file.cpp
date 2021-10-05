@@ -17,22 +17,26 @@ DownloadData* DownloadFile::Call(DownloadData* download_data)
     data.resize(download_data->GetDownloadSize());
   }
 
-  sf::Http http(download_data->GetHost());
-  sf::Http::Request request(download_data->GetResource(), sf::Http::Request::Get);
-  sf::Http::Response response = http.sendRequest(request, sf::seconds(2));
-
-  if (response.getStatus() == sf::Http::Response::Ok)
+  for (int i = 0; i < 3; ++i)
   {
-    if (download_data->GetDownloadSize() == 0) { data.resize(response.getBody().size()); }
-    const std::string& body_str = response.getBody();
+    sf::Http http(download_data->GetHost());
+    sf::Http::Request request(download_data->GetResource(), sf::Http::Request::Get);
+    sf::Http::Response response = http.sendRequest(request, sf::seconds(15));
 
-    std::copy(body_str.begin(), body_str.end(), data.begin());
+    if (response.getStatus() == sf::Http::Response::Ok)
+    {
+      if (download_data->GetDownloadSize() == 0) { data.resize(response.getBody().size()); }
+      const std::string& body_str = response.getBody();
 
-    download_data->SetData(std::move(data));
-  }
-  else
-  {
-    download_data->MarkFailed();
+      std::copy(body_str.begin(), body_str.end(), data.begin());
+
+      download_data->SetData(std::move(data));
+      break;
+    }
+    else
+    {
+      download_data->MarkFailed();
+    }
   }
   return download_data;
 }

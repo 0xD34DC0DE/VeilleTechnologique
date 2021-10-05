@@ -3,8 +3,8 @@
 namespace pipeline
 {
 
-DownloadData::DownloadData(std::string url, std::string write_filepath)
-  : url_(std::move(url)), output_filepath_(std::move(write_filepath)), failed_(false)
+DownloadData::DownloadData(std::string url, std::vector<std::string> write_filepaths)
+  : url_(std::move(url)), output_filepaths_(std::move(write_filepaths)), failed_(false)
 {
   SetHostAndResource(url_);
 }
@@ -29,9 +29,9 @@ std::size_t DownloadData::GetDownloadSize() const noexcept
   return download_size_;
 }
 
-const std::string& DownloadData::GetOutputFilepath() const noexcept
+const std::vector<std::string>& DownloadData::GetOutputFilepaths() const noexcept
 {
-  return output_filepath_;
+  return output_filepaths_;
 }
 
 const std::vector<uint8_t>& DownloadData::GetData() const noexcept

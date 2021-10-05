@@ -23,9 +23,14 @@ const std::vector<uint8_t>& TransientDatasetEntry::GetMaskBytes() const noexcept
   return mask_bytes_;
 }
 
-const std::vector<std::string>& TransientDatasetEntry::GetMaskIdValuesName() const noexcept
+const std::vector<std::string>* TransientDatasetEntry::GetMaskIdValuesName() const noexcept
 {
   return _mask_id_values_name;
+}
+
+void TransientDatasetEntry::SetMaskIdValuesName(const std::vector<std::string>* mask_id_values_name) noexcept
+{
+  _mask_id_values_name = mask_id_values_name;
 }
 
 } // namespace dataset

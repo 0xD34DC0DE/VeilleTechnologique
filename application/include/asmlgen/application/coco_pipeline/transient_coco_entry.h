@@ -34,14 +34,20 @@ public:
     return image_url_;
   }
 
+  [[nodiscard]] std::vector<AnnotationData> AnnotationsData() const noexcept
+  {
+    return annotation_segmentations_data;
+  }
+
+  std::string GetWritePath() const noexcept;
+
 protected:
-  // Coco dataset format implementation types and function used by friend parser class
-  uint32_t image_width_ {};
-  uint32_t image_height_ {};
+  // Coco dataset format implementation types used by friend parser class
   std::string image_url_;
+  std::string write_path_;
 
   // List of annotations and their corresponding category name
-  std::vector<std::pair<std::string, SegmentationData>> annotation_segmentations_data;
+  std::vector<AnnotationData> annotation_segmentations_data;
 };
 
 } // namespace dataset

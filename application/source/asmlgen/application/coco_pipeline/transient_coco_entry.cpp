@@ -9,4 +9,9 @@ std::size_t TransientCocoEntry::AcquireData()
 {
   return 0;
 }
+
+std::string TransientCocoEntry::GetWritePath() const noexcept
+{
+  return write_path_;
+}
 } // namespace dataset

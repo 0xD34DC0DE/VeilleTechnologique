@@ -23,7 +23,9 @@ public:
 
   [[nodiscard]] const std::vector<uint8_t>& GetImageBytes() const noexcept;
   [[nodiscard]] const std::vector<uint8_t>& GetMaskBytes() const noexcept;
-  [[nodiscard]] const std::vector<std::string>& GetMaskIdValuesName() const noexcept;
+  [[nodiscard]] const std::vector<std::string>* GetMaskIdValuesName() const noexcept;
+
+  void SetMaskIdValuesName(const std::vector<std::string>* mask_id_values_name) noexcept;
 
   ///
   /// Retrieve the data if there is a need to. Example: downloading, query a local database
@@ -36,7 +38,7 @@ public:
   ///
   virtual void ProcessData() = 0;
 
-private:
+protected:
   uint32_t image_width_ = 0;
   uint32_t image_height_ = 0;
 
@@ -45,7 +47,7 @@ private:
 
   /// Used to map the id's stored in the mask bytes to their corresponding class name
   // index 0 is always "None"
-  std::vector<std::string> _mask_id_values_name;
+  const std::vector<std::string>* _mask_id_values_name;
 };
 
 } // namespace dataset

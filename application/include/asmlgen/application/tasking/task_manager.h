@@ -22,9 +22,11 @@ class TaskManager
 
 public:
   // Use max_threads 0 to use the maximum number of threads the implementation can support minus 2
-  TaskManager(std::function<void(bool)>&& completion_callback, uint32_t max_threads = 0)
+  TaskManager(std::function<void(bool)>&& completion_callback,
+    std::function<void(size_t)>&& progression_callback,
+    uint32_t max_threads = 0)
     : all_task_done_(false), should_stop_(false), running_reusable_thread_count_(0),
-      completion_callback_(std::move(completion_callback)),
+      completion_callback_(std::move(completion_callback)), progression_callback_(std::move(progression_callback)),
       thread_(std::jthread(&TaskManager<Chainables...>::Loop, this))
   {
     if (!max_threads)
@@ -91,6 +93,7 @@ private:
   uint32_t running_reusable_thread_count_;
 
   std::function<void(bool)> completion_callback_;
+  std::function<void(size_t)> progression_callback_;
 
   std::jthread thread_;
   std::mutex mutex_;
@@ -112,6 +115,8 @@ private:
 
     outputs_.emplace_back(result);
 
+    progression_callback_(outputs_.size());
+
     condition_variable_.notify_one();
   }
 
@@ -127,7 +132,11 @@ private:
 
     if (input_index == inputs_.size())
     {
-      if (--running_reusable_thread_count_ == 0) { all_task_done_ = true; }
+      if (--running_reusable_thread_count_ == 0)
+      {
+        all_task_done_ = true;
+        all_task_done_ = true;
+      }
     }
     else
     {
@@ -163,6 +172,10 @@ private:
     {
       Wait();
       StartNewTasks();
+    }
+    for (auto& reusable_thread : reusable_threads_)
+    {
+      reusable_thread->Terminate();
     }
     completion_callback_(all_task_done_);
   }

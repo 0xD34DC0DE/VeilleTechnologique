@@ -10,7 +10,7 @@ const std::unordered_map<std::string, std::vector<std::string>>& DatasetJsonPars
 }
 
 template<typename T>
-uint64_t DatasetJsonParser<T>::LoadJson(const std::vector<char>&)
+uint64_t DatasetJsonParser<T>::LoadJson(const std::vector<char>&, const std::vector<std::string>&, const std::string&)
 {
   return 0;
 }

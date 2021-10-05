@@ -7,7 +7,8 @@
 namespace dataset
 {
 
-uint64_t CocoJsonParser::LoadJson(const std::vector<char>& json)
+uint64_t CocoJsonParser::LoadJson(
+  const std::vector<char>& json, const std::vector<std::string>& classes, const std::string& write_path)
 {
   rapidjson::Document* document = GetParsedDocument(json);
 
@@ -22,7 +23,10 @@ uint64_t CocoJsonParser::LoadJson(const std::vector<char>& json)
 
   class_name_groups_ = CreateClassNameGroups(categories);
 
-  const std::unordered_map<uint64_t, TransientCocoEntry> transient_entries = GenerateTransientEntries(annotations);
+  mask_id_values_name_ = GenerateMaskIdValueNames(categories);
+
+  const std::unordered_map<uint64_t, TransientCocoEntry> transient_entries =
+    GenerateTransientEntries(annotations, &mask_id_values_name_, write_path, classes);
 
   for (const auto& id_transient_entry_pair : transient_entries)
   {
@@ -33,30 +37,39 @@ uint64_t CocoJsonParser::LoadJson(const std::vector<char>& json)
 }
 
 std::unordered_map<uint64_t, TransientCocoEntry> CocoJsonParser::GenerateTransientEntries(
-  const CocoJsonParser::AnnotationMap& annotations)
+  const CocoJsonParser::AnnotationMap& annotations,
+  const std::vector<std::string>* mask_id_values_name,
+  const std::string& write_path,
+  const std::vector<std::string>& classes)
 {
   std::unordered_map<uint64_t, TransientCocoEntry> transient_entries;
   for (const auto& id_annotation_pair : annotations)
   {
-    auto transient_entry_iter = transient_entries.find(id_annotation_pair.second.imageId);
-    if (transient_entry_iter == transient_entries.end())
+    auto category_iter = std::ranges::find(classes, id_annotation_pair.second.category_name);
+    if (classes.empty() || category_iter != classes.end())
     {
-      TransientCocoEntry transient_coco_entry = TransientCocoEntry();
-      const COCOImage* coco_image = id_annotation_pair.second.cocoImagePtr;
+      auto transient_entry_iter = transient_entries.find(id_annotation_pair.second.imageId);
+      if (transient_entry_iter == transient_entries.end())
+      {
+        TransientCocoEntry transient_coco_entry = TransientCocoEntry();
+        const COCOImage* coco_image = id_annotation_pair.second.cocoImagePtr;
 
-      transient_coco_entry.image_width_ = coco_image->width;
-      transient_coco_entry.image_height_ = coco_image->height;
-      transient_coco_entry.image_url_ = coco_image->COCOUrl;
+        transient_coco_entry.image_width_ = coco_image->width;
+        transient_coco_entry.image_height_ = coco_image->height;
+        transient_coco_entry.image_url_ = coco_image->COCOUrl;
+        transient_coco_entry.write_path_ = write_path;
+        transient_coco_entry.SetMaskIdValuesName(mask_id_values_name);
 
-      transient_coco_entry.annotation_segmentations_data.emplace_back(
-        id_annotation_pair.second.category_name, id_annotation_pair.second.segmentation);
+        transient_coco_entry.annotation_segmentations_data.emplace_back(
+          id_annotation_pair.second.category_name, id_annotation_pair.second.segmentation);
 
-      transient_entries[id_annotation_pair.second.imageId] = transient_coco_entry;
-    }
-    else
-    {
-      transient_entry_iter->second.annotation_segmentations_data.emplace_back(
-        id_annotation_pair.second.category_name, id_annotation_pair.second.segmentation);
+        transient_entries[id_annotation_pair.second.imageId] = transient_coco_entry;
+      }
+      else
+      {
+        transient_entry_iter->second.annotation_segmentations_data.emplace_back(
+          id_annotation_pair.second.category_name, id_annotation_pair.second.segmentation);
+      }
     }
   }
 
@@ -249,4 +262,24 @@ DatasetJsonParser<CocoJsonParser>::ClassNameGroupMap CocoJsonParser::CreateClass
 
   return class_name_group_map;
 }
+
+std::vector<std::string> CocoJsonParser::GenerateMaskIdValueNames(const CocoJsonParser::CategoryMap& categories)
+{
+  std::vector<std::string> mask_id_values_name {};
+  mask_id_values_name.emplace_back("None"); // Index 0 is always none
+
+  for (auto& category : categories)
+  {
+    auto nameIt = std::ranges::find(mask_id_values_name, category.second.name);
+    if (nameIt == mask_id_values_name.end()) { mask_id_values_name.emplace_back(category.second.name); }
+  }
+
+  return mask_id_values_name;
+}
+
+const std::vector<std::string>& CocoJsonParser::GetMaskIdValuesName() const noexcept
+{
+  return mask_id_values_name_;
+}
+
 } // namespace dataset

@@ -21,6 +21,7 @@ struct COCOImage
 
 using PolygonCoordinatesArrays = std::vector<std::vector<float>>;
 using SegmentationData = std::variant<PolygonCoordinatesArrays, std::vector<float>>;
+using AnnotationData = std::pair<std::string, SegmentationData>;
 
 struct COCOAnnotation
 {

@@ -5,19 +5,29 @@
 namespace pipeline
 {
 
-FileWriteData::FileWriteData(std::string directory_path, std::string filename, std::vector<uint8_t> data)
-  : directory_path_(std::move(directory_path)), filename_(std::move(filename)), data_(std::move(data))
+FileWriteData::FileWriteData(std::vector<std::string> directory_paths,
+  std::string filename,
+  std::vector<std::vector<uint8_t>> datas,
+  bool is_decompression)
+  : directory_paths_(std::move(directory_paths)), filename_(std::move(filename)), datas_(std::move(datas)),
+    is_decompression_(is_decompression)
 {
-  if (!directory_path_.empty())
+  if (!is_decompression)
   {
-    const char& last_char = directory_path_.back();
-    if (last_char != '/' || last_char != '\\') { directory_path_.append("/"); }
+    for (auto& directory_path : directory_paths_)
+    {
+      if (!directory_path.empty())
+      {
+        const char& last_char = directory_path.back();
+        if (last_char != '/' || last_char != '\\') { directory_path.append("/"); }
+      }
+    }
   }
 }
 
-const std::string& FileWriteData::GetDirectoryPath() const noexcept
+const std::vector<std::string>& FileWriteData::GetDirectoryPaths() const noexcept
 {
-  return directory_path_;
+  return directory_paths_;
 }
 
 const std::string& FileWriteData::GetFilename() const noexcept
@@ -25,24 +35,14 @@ const std::string& FileWriteData::GetFilename() const noexcept
   return filename_;
 }
 
-const std::vector<uint8_t>& FileWriteData::GetData() const noexcept
+const std::vector<std::vector<uint8_t>>& FileWriteData::GetDatas() const noexcept
 {
-  return data_;
+  return datas_;
 }
 
-std::string FileWriteData::GetFullPath() const
+bool FileWriteData::IsDecompression() const
 {
-  return directory_path_ + filename_;
-}
-
-const uint8_t* FileWriteData::GetDataPtr() const noexcept
-{
-  return data_.data();
-}
-
-std::size_t FileWriteData::GetDataSize() const noexcept
-{
-  return data_.size();
+  return is_decompression_;
 }
 
 } // namespace pipeline

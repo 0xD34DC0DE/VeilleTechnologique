@@ -12,7 +12,7 @@ class DownloadData
 {
 public:
   DownloadData() = default;
-  DownloadData(std::string url, std::string write_filepath);
+  DownloadData(std::string url, std::vector<std::string> write_filepaths);
 
   [[nodiscard]] const std::string& GetUrl() const noexcept;
 
@@ -22,7 +22,7 @@ public:
 
   [[nodiscard]] std::size_t GetDownloadSize() const noexcept;
 
-  [[nodiscard]] const std::string& GetOutputFilepath() const noexcept;
+  [[nodiscard]] const std::vector<std::string>& GetOutputFilepaths() const noexcept;
 
   [[nodiscard]] const std::vector<uint8_t>& GetData() const noexcept;
 
@@ -43,7 +43,7 @@ private:
   std::string host_;
   std::string resource_;
   std::size_t download_size_;
-  std::string output_filepath_;
+  std::vector<std::string> output_filepaths_;
 
   std::vector<uint8_t> data_;
 

@@ -11,24 +11,24 @@ class FileWriteData
 {
 public:
   FileWriteData() = default;
-  FileWriteData(std::string directory_path, std::string filename, std::vector<uint8_t> data);
+  FileWriteData(std::vector<std::string> directory_path,
+    std::string filename,
+    std::vector<std::vector<uint8_t>> datas,
+    bool is_decompression = false);
 
-  [[nodiscard]] const std::string& GetDirectoryPath() const noexcept;
+  [[nodiscard]] const std::vector<std::string>& GetDirectoryPaths() const noexcept;
 
   [[nodiscard]] const std::string& GetFilename() const noexcept;
 
-  [[nodiscard]] std::string GetFullPath() const;
+  [[nodiscard]] const std::vector<std::vector<uint8_t>>& GetDatas() const noexcept;
 
-  [[nodiscard]] const std::vector<uint8_t>& GetData() const noexcept;
-
-  [[nodiscard]] const uint8_t* GetDataPtr() const noexcept;
-
-  [[nodiscard]] std::size_t GetDataSize() const noexcept;
+  [[nodiscard]] bool IsDecompression() const;
 
 private:
-  std::string directory_path_;
+  std::vector<std::string> directory_paths_;
   std::string filename_;
-  std::vector<uint8_t> data_;
+  std::vector<std::vector<uint8_t>> datas_;
+  bool is_decompression_;
 };
 
 } // namespace pipeline
